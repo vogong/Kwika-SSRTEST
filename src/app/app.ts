@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavComponent } from './components/nav/nav.component';
+import { RedirectService } from './services/redirect.service';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +18,12 @@ import { NavComponent } from './components/nav/nav.component';
     }
   `]
 })
-export class App {
+export class App implements OnInit {
   protected title = 'angular-ssr-metadata';
+  private redirectService = inject(RedirectService);
+  
+  ngOnInit() {
+    // Initialize the redirect service to handle redirection after SSR content is rendered
+    this.redirectService.initRedirect();
+  }
 }

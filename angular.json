@@ -96,6 +96,62 @@
               "src/styles.scss"
             ]
           }
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist/angular-ssr-metadata/server",
+            "main": "server.ts",
+            "tsConfig": "tsconfig.server.json"
+          },
+          "configurations": {
+            "production": {
+              "outputHashing": "media",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "sourceMap": false,
+              "optimization": true
+            },
+            "development": {
+              "optimization": false,
+              "sourceMap": true,
+              "extractLicenses": false
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve-ssr": {
+          "builder": "@nguniversal/builders:ssr-dev-server",
+          "options": {
+            "browserTarget": "angular-ssr-metadata:build:development",
+            "serverTarget": "angular-ssr-metadata:server:development"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "angular-ssr-metadata:build:production",
+              "serverTarget": "angular-ssr-metadata:server:production"
+            }
+          }
+        },
+        "prerender": {
+          "builder": "@nguniversal/builders:prerender",
+          "options": {
+            "routes": ["/", "/about"]
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "angular-ssr-metadata:build:production",
+              "serverTarget": "angular-ssr-metadata:server:production"
+            },
+            "development": {
+              "browserTarget": "angular-ssr-metadata:build:development",
+              "serverTarget": "angular-ssr-metadata:server:development"
+            }
+          }
         }
       }
     }

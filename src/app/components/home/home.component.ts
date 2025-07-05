@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { SeoService } from '../../services/seo.service';
 import { CommonModule } from '@angular/common';
 import { logSeoMetadata } from '../../utils/seo-debug';
+import { RedirectService } from '../../services/redirect.service';
 
 @Component({
   selector: 'app-home',
@@ -20,6 +21,12 @@ import { logSeoMetadata } from '../../utils/seo-debug';
           <li>Enhanced social media sharing</li>
           <li>Increased accessibility</li>
         </ul>
+      </div>
+      
+      <div class="redirect-notice">
+        <h3>Redirecting to Main Site</h3>
+        <p>You will be automatically redirected to our main site in a moment...</p>
+        <button (click)="redirectNow()" class="redirect-button">Go to Main Site Now</button>
       </div>
       
       <div class="meta-info">
@@ -45,6 +52,29 @@ import { logSeoMetadata } from '../../utils/seo-debug';
       border-left: 4px solid #1976d2;
       padding: 1rem;
       margin: 2rem 0;
+    }
+    
+    .redirect-notice {
+      background-color: #fff8e1;
+      border-left: 4px solid #ffc107;
+      padding: 1rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    
+    .redirect-button {
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .redirect-button:hover {
+      background-color: #1565c0;
     }
     
     .meta-info {
@@ -75,19 +105,26 @@ export class HomeComponent implements OnInit {
     twitterCard: 'summary'
   }, null, 2);
 
+  private redirectService = inject(RedirectService);
+  
   constructor(private seoService: SeoService) {}
 
   ngOnInit(): void {
-    // Set metadata for this page
+    // Set metadata for this page - this will be what search engines see
     this.seoService.updateMetadata({
-      title: 'Angular SSR Metadata - Home',
-      description: 'An Angular application with server-side rendering and SEO optimization',
-      keywords: ['angular', 'ssr', 'seo', 'metadata', 'home']
+      title: 'Saffasel - Your Complete Solution',
+      description: 'Discover Saffasel - the complete solution for all your needs. Optimized for performance and user experience.',
+      keywords: ['saffasel', 'solution', 'platform', 'service', 'application']
     });
     
     // Only log metadata in browser environment, not during SSR
     if (typeof window !== 'undefined') {
       setTimeout(() => logSeoMetadata(), 100); // Small delay to ensure metadata is updated
     }
+  }
+  
+  // Method to manually trigger redirect
+  redirectNow(): void {
+    this.redirectService.redirectToMainSite();
   }
 }

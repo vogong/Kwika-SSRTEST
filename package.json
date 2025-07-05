@@ -7,7 +7,13 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:angular-ssr-metadata": "node dist/angular-ssr-metadata/server/server.mjs"
+    "build:prod": "ng build --configuration production",
+    "serve:express": "node static-server.js",
+    "start:express": "npm run build:prod && npm run serve:express",
+    "dev:ssr": "ng run angular-ssr-metadata:serve-ssr",
+    "serve:ssr": "node dist/angular-ssr-metadata/server/main.js",
+    "build:ssr": "ng build && ng run angular-ssr-metadata:server",
+    "prerender": "ng run angular-ssr-metadata:prerender"
   },
   "prettier": {
     "overrides": [
@@ -29,6 +35,8 @@
     "@angular/platform-server": "^20.0.0",
     "@angular/router": "^20.0.0",
     "@angular/ssr": "^20.0.5",
+    "@nguniversal/builders": "^16.2.0",
+    "@nguniversal/express-engine": "^16.2.0",
     "express": "^5.1.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
